@@ -1,19 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
-    private users: User[] = [
-    { id: 1, name: 'Juan Perez', email: 'juan@example.com' },
-    { id: 2, name: 'Maria Lopez', email: 'maria@example.com' },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
-  findAll(): User[] {
-    return this.users;
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
-  findOne(id: number): User {
-    const user = this.users.find((user) => user.id === id);
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -22,19 +24,31 @@ export class UsersService {
     return user;
   }
 
-  create(name: string, email: string): User {
-    const newUser: User = {
-      id: this.users.length + 1,
+  async create(name: string, email: string): Promise<User> {
+    const existingUser = await this.usersRepository.findOneBy({ email });
+
+    if (existingUser) {
+      throw new ConflictException(`User with email ${email} already exists`);
+    }
+    
+    const newUser = this.usersRepository.create({
       name,
       email,
-    };
+    });
 
-    this.users.push(newUser);
-    return newUser;
+    return this.usersRepository.save(newUser);
   }
 
-  update(id: number, name?: string, email?: string): User {
-    const user = this.findOne(id);
+  async update(id: number, name?: string, email?: string): Promise<User> {
+    const user = await this.findOne(id);
+
+    if (email && email !== user.email) {
+      const existingUser = await this.usersRepository.findOneBy({ email });
+
+      if (existingUser) {
+        throw new ConflictException(`User with email ${email} already exists`);
+      }
+    }
 
     if (name !== undefined) {
       user.name = name;
@@ -43,13 +57,13 @@ export class UsersService {
       user.email = email;
     }
 
-    return user;
+    return this.usersRepository.save(user);
   }
 
-  remove(id: number): { message: string } {
-    const user = this.findOne(id);
+  async remove(id: number): Promise<{ message: string }> {
+    const user = await this.findOne(id);
 
-    this.users = this.users.filter((u) => u.id !== user.id);
+    await this.usersRepository.remove(user);
 
     return { message: `User with id ${id} deleted successfully` };
   }

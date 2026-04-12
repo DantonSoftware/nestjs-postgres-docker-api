@@ -9,17 +9,17 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get()
-    findAll(): User[] {
+    findAll(): Promise<User[]> {
         return this.usersService.findAll();
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number): User {
+    findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
         return this.usersService.findOne(id);
     }
 
     @Post()
-    create(@Body() createUserDto: CreateUserDto): User {
+    create(@Body() createUserDto: CreateUserDto): Promise<User> {
         return this.usersService.create(createUserDto.name, createUserDto.email);
     }
 
@@ -27,12 +27,12 @@ export class UsersController {
     update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateUserDto: UpdateUserDto,
-    ): User {
+    ): Promise<User> {
         return this.usersService.update(id, updateUserDto.name, updateUserDto.email);
     }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number): { message: string } {
+    remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
         return this.usersService.remove(id);
     }
 }
