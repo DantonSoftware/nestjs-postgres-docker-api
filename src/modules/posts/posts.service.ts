@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
@@ -13,10 +13,37 @@ export class PostsService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async findAll(): Promise<Post[]> {
-    return this.postsRepository.find({
+  // async findAll(): Promise<Post[]> {
+  //   return this.postsRepository.find({
+  //     relations: ['user'],
+  //   });
+  // }
+  async findAll(page = 1, limit = 10, title?: string) {
+    const where = title
+      ? {
+          title: ILike(`%${title}%`),
+        }
+      : {};
+
+    const [data, total] = await this.postsRepository.findAndCount({
+      where,
       relations: ['user'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        id: 'DESC',
+      },
     });
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: number): Promise<Post> {

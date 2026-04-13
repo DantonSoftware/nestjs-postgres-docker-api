@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post as HttpPost, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post as HttpPost, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUserData } from '../../common/interfaces/current-user.interface';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { FindPostsQueryDto } from './dto/find-posts-query.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -19,8 +20,8 @@ export class PostsController {
     @ApiOperation({ summary: 'Obtener todos los posts con su usuario' })
     @ApiResponse({ status: 200, description: 'Lista de posts' })
     @ApiResponse({ status: 401, description: 'No autorizado' })
-    findAll(): Promise<Post[]> {
-        return this.postsService.findAll();
+    findAll(@Query() query: FindPostsQueryDto) {
+        return this.postsService.findAll(query.page, query.limit, query.title);
     }
 
     @HttpPost()
