@@ -202,5 +202,6 @@ Después de pegarlo:
 git add README.md
 git commit -m "docs: improve project README"
 git push
+```md
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
