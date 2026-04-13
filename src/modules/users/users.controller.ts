@@ -1,4 +1,4 @@
-import { Controller, Get, ParseIntPipe, Param, Post, Body, Patch, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Param, Post, Body, Patch, Delete, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import type { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -8,6 +8,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Role } from '../../common/enums/role.enum';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { FindUsersQueryDto } from './dto/find-users-query.dto';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -22,9 +24,13 @@ export class UsersController {
     @ApiResponse({ status: 200, description: 'Lista de usuarios' })
     @ApiResponse({ status: 401, description: 'No autorizado' })
     @ApiResponse({ status: 403, description: 'No permitido' })
-    @ApiOperation({ summary: 'Obtener todos los usuarios' })
-    findAll(): Promise<User[]> {
-        return this.usersService.findAll();
+    findAll(@Query() query: FindUsersQueryDto) {
+        return this.usersService.findAll(
+            query.page,
+            query.limit,
+            query.name,
+            query.email,
+        );
     }
 
     @Get(':id')
@@ -62,5 +68,22 @@ export class UsersController {
     @ApiResponse({ status: 403, description: 'No permitido' })
     remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
         return this.usersService.remove(id);
+    }
+
+    @Patch(':id/status')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Activar o desactivar un usuario' })
+    @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+    @ApiResponse({ status: 200, description: 'Estado del usuario actualizado' })
+    @ApiResponse({ status: 401, description: 'No autorizado' })
+    @ApiResponse({ status: 403, description: 'No permitido' })
+    @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+    updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserStatusDto: UpdateUserStatusDto,
+    ): Promise<User> {
+    return this.usersService.updateStatus(id, updateUserStatusDto.isActive);
     }
 }

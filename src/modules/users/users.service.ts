@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../../common/enums/role.enum';
@@ -12,8 +12,38 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  // findAll(): Promise<User[]> {
+  //   return this.usersRepository.find();
+  // }
+  async findAll(page = 1, limit = 10, name?: string, email?: string) {
+    const where: Record<string, unknown> = {};
+
+    if (name) {
+      where.name = ILike(`%${name}%`);
+    }
+
+    if (email) {
+      where.email = ILike(`%${email}%`);
+    }
+
+    const [data, total] = await this.usersRepository.findAndCount({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        id: 'DESC',
+      },
+    });
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: number): Promise<User> {
@@ -40,6 +70,7 @@ export class UsersService {
       email,
       password: hashedPassword,
       role: Role.USER,
+      isActive: true,
     });
 
     return this.usersRepository.save(newUser);
@@ -72,6 +103,14 @@ export class UsersService {
     await this.usersRepository.remove(user);
 
     return { message: `User with id ${id} deleted successfully` };
+  }
+
+  async updateStatus(id: number, isActive: boolean): Promise<User> {
+    const user = await this.findOne(id);
+
+    user.isActive = isActive;
+
+    return this.usersRepository.save(user);
   }
 
 }

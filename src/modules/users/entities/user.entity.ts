@@ -35,6 +35,12 @@ export class User {
   })
   role!: Role;
 
+  @Column({
+    type: 'boolean',
+    default: true,
+  })
+  isActive!: boolean;
+
   @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];
 }
