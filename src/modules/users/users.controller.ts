@@ -1,9 +1,13 @@
-import { Controller, Get, ParseIntPipe, Param, Post, Body, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Param, Post, Body, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import type { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Role } from '../../common/enums/role.enum';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -11,6 +15,13 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get()
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Obtener todos los usuarios' })
+    @ApiResponse({ status: 200, description: 'Lista de usuarios' })
+    @ApiResponse({ status: 401, description: 'No autorizado' })
+    @ApiResponse({ status: 403, description: 'No permitido' })
     @ApiOperation({ summary: 'Obtener todos los usuarios' })
     findAll(): Promise<User[]> {
         return this.usersService.findAll();
@@ -41,7 +52,14 @@ export class UsersController {
     }
 
     @Delete(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Eliminar un usuario' })
+    @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+    @ApiResponse({ status: 200, description: 'Usuario eliminado' })
+    @ApiResponse({ status: 401, description: 'No autorizado' })
+    @ApiResponse({ status: 403, description: 'No permitido' })
     remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
         return this.usersService.remove(id);
     }

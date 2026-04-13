@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { Post } from 'src/modules/posts/entities/post.entity';
+import { Role } from '../../../common/enums/role.enum';
+import { Post } from '../../posts/entities/post.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -26,6 +27,13 @@ export class User {
     length: 255,
   })
   password!: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role!: Role;
 
   @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];

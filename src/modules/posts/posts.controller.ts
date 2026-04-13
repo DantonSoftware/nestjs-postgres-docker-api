@@ -4,8 +4,8 @@ import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { CurrentUserData } from 'src/common/interfaces/current-user.interface';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { CurrentUserData } from '../../common/interfaces/current-user.interface';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @ApiTags('Posts')

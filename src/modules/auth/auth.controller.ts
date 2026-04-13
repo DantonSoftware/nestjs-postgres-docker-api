@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { CurrentUserData } from 'src/common/interfaces/current-user.interface';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { CurrentUserData } from '../../common/interfaces/current-user.interface';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
