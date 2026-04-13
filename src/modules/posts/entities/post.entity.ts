@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'posts' })
@@ -22,4 +22,8 @@ export class Post {
     onDelete: 'CASCADE',
   })
   user!: User;
+  
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
 }

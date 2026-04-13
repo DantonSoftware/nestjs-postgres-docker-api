@@ -105,7 +105,7 @@ export class PostsService {
       throw new ForbiddenException('You are not allowed to delete this post');
     }
 
-    await this.postsRepository.remove(post);
+    await this.postsRepository.softRemove(post);
 
     return { message: `Post with id ${postId} deleted successfully` };
   }
