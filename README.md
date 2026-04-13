@@ -195,8 +195,3 @@ Author
 
 Developed by DantonSoftware
 
-```bash
-git add README.md
-git commit -m "docs: improve project README"
-git push
-```md
