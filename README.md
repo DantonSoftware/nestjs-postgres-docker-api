@@ -1,5 +1,13 @@
 # NestJS PostgreSQL Docker API
 
+![NestJS](https://img.shields.io/badge/NestJS-Framework-E0234E?logo=nestjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-Language-3178C6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white)
+![TypeORM](https://img.shields.io/badge/TypeORM-ORM-FE0803)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-black?logo=jsonwebtokens)
+![Swagger](https://img.shields.io/badge/Docs-Swagger-85EA2D?logo=swagger&logoColor=black)
+
 Backend API built with **NestJS**, **PostgreSQL**, **TypeORM**, and **Docker**.  
 This project includes **JWT authentication**, **role-based authorization**, **ownership validation**, **pagination**, **Swagger documentation**, and **database migrations**.
 
@@ -194,3 +202,5 @@ Después de pegarlo:
 git add README.md
 git commit -m "docs: improve project README"
 git push
+
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
